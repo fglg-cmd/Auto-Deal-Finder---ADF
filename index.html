@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Deal Finder — Trouvez les meilleures opportunités automobiles</title>
+<meta name="description" content="Analysez le marché automobile, identifiez les véhicules sous-évalués et estimez votre marge en quelques secondes. Le logiciel des professionnels VO.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12151a;
+    --bg-elevated:#1a1e25;
+    --bg-card:#181c23;
+    --border:#282e38;
+    --border-soft:#20252d;
+    --text:#edeff2;
+    --text-muted:#8b94a3;
+    --text-dim:#5c6472;
+    --accent:#e3b341;
+    --accent-dim:#8a6d28;
+    --positive:#4fbf87;
+    --negative:#e5646a;
+    --radius:10px;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+  ::selection{background:var(--accent); color:#12151a;}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+
+  /* Background texture */
+  body{
+    background-image:
+      radial-gradient(circle at 85% -10%, rgba(227,179,65,0.10), transparent 45%),
+      radial-gradient(circle at 0% 20%, rgba(79,191,135,0.06), transparent 40%);
+    background-attachment:fixed;
+  }
+
+  /* ===== NAV ===== */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(18,21,26,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border-soft);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px; max-width:1180px; margin:0 auto;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-display); font-weight:700; font-size:17px; letter-spacing:0.2px;
+  }
+  .logo-mark{
+    width:26px; height:26px; border-radius:6px;
+    background:linear-gradient(135deg, var(--accent), #b8862c);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:12px; font-weight:700; color:#14171c;
+  }
+  .nav-links{display:flex; gap:32px; align-items:center;}
+  .nav-links a{font-size:14px; color:var(--text-muted); transition:color .15s;}
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{display:flex; align-items:center; gap:14px;}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:10px 18px; border-radius:8px; font-size:14px; font-weight:600;
+    cursor:pointer; border:1px solid transparent; transition:all .15s;
+    font-family:var(--font-body);
+  }
+  .btn-primary{background:var(--accent); color:#14171c;}
+  .btn-primary:hover{background:#eec565; transform:translateY(-1px);}
+  .btn-ghost{color:var(--text); border-color:var(--border);}
+  .btn-ghost:hover{border-color:var(--text-dim); background:var(--bg-elevated);}
+  .btn-lg{padding:14px 26px; font-size:15px;}
+  .menu-toggle{display:none; background:none; border:none; color:var(--text); font-size:22px; cursor:pointer;}
+
+  /* ===== HERO ===== */
+  .hero{
+    padding:88px 0 60px;
+    display:grid; grid-template-columns:1.05fr 1fr; gap:56px; align-items:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--accent); border:1px solid rgba(227,179,65,0.3); background:rgba(227,179,65,0.06);
+    padding:6px 12px; border-radius:20px; margin-bottom:22px;
+  }
+  .eyebrow-dot{width:6px; height:6px; border-radius:50%; background:var(--positive); box-shadow:0 0 0 3px rgba(79,191,135,0.2);}
+  h1{
+    font-family:var(--font-display); font-weight:700;
+    font-size:clamp(34px, 4.6vw, 54px); line-height:1.08; letter-spacing:-0.02em;
+    margin-bottom:22px;
+  }
+  h1 .hl{color:var(--accent);}
+  .hero p.lead{
+    font-size:17px; color:var(--text-muted); max-width:520px; margin-bottom:34px;
+  }
+  .hero-actions{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:28px;}
+  .hero-note{font-size:13px; color:var(--text-dim); display:flex; gap:18px; flex-wrap:wrap;}
+  .hero-note span{display:flex; align-items:center; gap:6px;}
+  .check{color:var(--positive);}
+
+  /* ===== TERMINAL CARD (signature element) ===== */
+  .terminal{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:14px;
+    overflow:hidden; box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+  }
+  .terminal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-bottom:1px solid var(--border-soft); background:var(--bg-elevated);
+  }
+  .terminal-head .dots{display:flex; gap:6px;}
+  .terminal-head .dots span{width:9px; height:9px; border-radius:50%; background:#3a4150;}
+  .terminal-title{font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim); letter-spacing:0.03em;}
+  .terminal-live{display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; color:var(--positive);}
+  .terminal-live i{width:6px; height:6px; border-radius:50%; background:var(--positive); animation:pulse 1.8s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:0.3;}}
+
+  .deal-row{
+    display:grid; grid-template-columns:1fr auto auto; gap:14px; align-items:center;
+    padding:14px 18px; border-bottom:1px solid var(--border-soft);
+    opacity:0; transform:translateY(6px);
+    animation:rowIn .5s ease forwards;
+  }
+  .deal-row:last-child{border-bottom:none;}
+  .deal-row:nth-child(2){animation-delay:.05s;}
+  .deal-row:nth-child(3){animation-delay:.15s;}
+  .deal-row:nth-child(4){animation-delay:.25s;}
+  .deal-row:nth-child(5){animation-delay:.35s;}
+  @keyframes rowIn{to{opacity:1; transform:translateY(0);}}
+  .deal-name{font-size:14px; font-weight:600;}
+  .deal-meta{font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim); margin-top:2px;}
+  .deal-score{
+    font-family:var(--font-mono); font-size:13px; font-weight:700;
+    padding:4px 9px; border-radius:6px; white-space:nowrap;
+  }
+  .score-high{color:#14171c; background:var(--accent);}
+  .score-mid{color:var(--positive); background:rgba(79,191,135,0.12); border:1px solid rgba(79,191,135,0.3);}
+  .deal-margin{font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--positive); text-align:right; white-space:nowrap;}
+  .terminal-foot{
+    padding:12px 18px; display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim); background:var(--bg-elevated);
+    border-top:1px solid var(--border-soft);
+  }
+
+  /* ===== SECTIONS ===== */
+  section{padding:90px 0;}
+  .section-border{border-top:1px solid var(--border-soft);}
+  .section-head{max-width:620px; margin-bottom:52px;}
+  .section-tag{font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; display:block;}
+  h2{font-family:var(--font-display); font-weight:600; font-size:clamp(26px,3vw,36px); letter-spacing:-0.01em; margin-bottom:14px;}
+  .section-head p{color:var(--text-muted); font-size:15.5px;}
+  .center{text-align:center; margin-left:auto; margin-right:auto;}
+
+  /* Problem grid */
+  .problem-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-soft); border:1px solid var(--border-soft); border-radius:12px; overflow:hidden;}
+  .problem-item{background:var(--bg-card); padding:26px 24px;}
+  .problem-item .n{font-family:var(--font-mono); font-size:12px; color:var(--text-dim); margin-bottom:10px;}
+  .problem-item h3{font-family:var(--font-display); font-size:16.5px; font-weight:600; margin-bottom:8px;}
+  .problem-item p{font-size:13.5px; color:var(--text-muted);}
+
+  /* How it works */
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
+  .step{position:relative; padding-top:36px;}
+  .step::before{
+    content:attr(data-n); font-family:var(--font-mono); font-size:34px; font-weight:700;
+    color:transparent; -webkit-text-stroke:1.3px var(--border); position:absolute; top:-8px; left:0;
+  }
+  .step h3{font-family:var(--font-display); font-size:16px; font-weight:600; margin-bottom:8px;}
+  .step p{font-size:13.5px; color:var(--text-muted);}
+
+  /* Score explainer */
+  .score-panel{
+    display:grid; grid-template-columns:0.9fr 1.1fr; gap:48px; align-items:center;
+    background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:44px;
+  }
+  .score-visual{display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;}
+  .score-ring{
+    width:168px; height:168px; border-radius:50%;
+    background:conic-gradient(var(--accent) 0deg 338deg, var(--border) 338deg 360deg);
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .score-ring::before{content:''; position:absolute; inset:12px; background:var(--bg-card); border-radius:50%;}
+  .score-ring .val{position:relative; font-family:var(--font-mono); font-weight:700; font-size:32px;}
+  .score-ring .val small{display:block; font-size:11px; color:var(--text-dim); font-weight:500; margin-top:2px;}
+  .score-tag{font-size:13px; color:var(--positive); font-weight:600;}
+  .score-bars{display:flex; flex-direction:column; gap:14px;}
+  .score-bar-row{display:grid; grid-template-columns:150px 1fr 40px; gap:12px; align-items:center; font-size:13px;}
+  .score-bar-row span:last-child{font-family:var(--font-mono); text-align:right; color:var(--text-muted);}
+  .bar-track{height:6px; background:var(--border-soft); border-radius:4px; overflow:hidden;}
+  .bar-fill{height:100%; background:linear-gradient(90deg, var(--accent-dim), var(--accent)); border-radius:4px;}
+
+  /* Margin example */
+  .margin-grid{display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center;}
+  .ledger{background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:6px; font-family:var(--font-mono); font-size:14px;}
+  .ledger-row{display:flex; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border-soft);}
+  .ledger-row:last-child{border-bottom:none;}
+  .ledger-row.total{background:var(--bg-elevated); border-radius:8px; font-weight:700;}
+  .ledger-row.total .val{color:var(--positive);}
+  .ledger-row .lab{color:var(--text-muted);}
+  .ledger-row .val{color:var(--text);}
+
+  /* Pricing */
+  .pricing-note{
+    display:flex; align-items:center; gap:12px; justify-content:center;
+    background:rgba(227,179,65,0.06); border:1px solid rgba(227,179,65,0.25);
+    padding:14px 20px; border-radius:10px; max-width:640px; margin:0 auto 48px;
+    font-size:13.5px; color:var(--text);
+  }
+  .pricing-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+  .price-card{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:30px 24px;
+    display:flex; flex-direction:column; gap:18px; transition:border-color .15s, transform .15s;
+  }
+  .price-card:hover{transform:translateY(-3px); border-color:var(--text-dim);}
+  .price-card.featured{border-color:var(--accent); background:linear-gradient(180deg, rgba(227,179,65,0.06), var(--bg-card) 40%); position:relative;}
+  .price-card.featured::before{
+    content:'Le plus choisi'; position:absolute; top:-11px; left:24px;
+    background:var(--accent); color:#14171c; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;
+  }
+  .price-name{font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--text-muted);}
+  .price-amount{font-family:var(--font-mono); font-size:32px; font-weight:700;}
+  .price-amount small{font-size:13px; font-weight:500; color:var(--text-dim);}
+  .price-list{display:flex; flex-direction:column; gap:9px; font-size:13.5px; color:var(--text-muted);}
+  .price-list li{list-style:none; display:flex; gap:8px;}
+  .price-list li::before{content:'✓'; color:var(--positive); font-weight:700;}
+
+  /* FAQ */
+  .faq{max-width:760px; margin:0 auto;}
+  .faq-item{border-bottom:1px solid var(--border-soft);}
+  .faq-q{
+    width:100%; text-align:left; background:none; border:none; color:var(--text);
+    font-family:var(--font-body); font-size:15.5px; font-weight:600; cursor:pointer;
+    padding:20px 0; display:flex; justify-content:space-between; align-items:center; gap:16px;
+  }
+  .faq-q .icon{font-family:var(--font-mono); color:var(--accent); font-size:18px; transition:transform .2s; flex-shrink:0;}
+  .faq-item.open .icon{transform:rotate(45deg);}
+  .faq-a{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+  .faq-a p{padding-bottom:20px; color:var(--text-muted); font-size:14.5px; max-width:640px;}
+
+  /* Security strip */
+  .sec-strip{display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
+  .sec-item{display:flex; gap:14px; align-items:flex-start;}
+  .sec-icon{
+    width:36px; height:36px; border-radius:8px; background:var(--bg-elevated); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:14px; color:var(--accent); flex-shrink:0;
+  }
+  .sec-item h4{font-size:14px; font-weight:600; margin-bottom:4px;}
+  .sec-item p{font-size:13px; color:var(--text-muted);}
+
+  /* Final CTA */
+  .final-cta{
+    text-align:center; background:var(--bg-card); border:1px solid var(--border); border-radius:20px;
+    padding:70px 40px; position:relative; overflow:hidden;
+  }
+  .final-cta::before{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(circle at 50% 0%, rgba(227,179,65,0.14), transparent 60%);
+  }
+  .final-cta > *{position:relative;}
+  .final-cta h2{margin-bottom:16px;}
+  .final-cta p{color:var(--text-muted); max-width:480px; margin:0 auto 32px; font-size:15.5px;}
+
+  footer{border-top:1px solid var(--border-soft); padding:48px 0 32px;}
+  .footer-grid{display:flex; justify-content:space-between; flex-wrap:wrap; gap:32px; margin-bottom:32px;}
+  .footer-brand p{font-size:13px; color:var(--text-dim); max-width:260px; margin-top:10px;}
+  .footer-cols{display:flex; gap:64px; flex-wrap:wrap;}
+  .footer-col h5{font-size:12px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-dim); margin-bottom:14px;}
+  .footer-col a{display:block; font-size:13.5px; color:var(--text-muted); margin-bottom:10px;}
+  .footer-col a:hover{color:var(--text);}
+  .footer-bottom{display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-dim); border-top:1px solid var(--border-soft); padding-top:24px; flex-wrap:wrap; gap:10px;}
+
+  .reveal{opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  @media (max-width: 900px){
+    .hero{grid-template-columns:1fr; padding-top:56px;}
+    .problem-grid{grid-template-columns:1fr;}
+    .steps{grid-template-columns:1fr 1fr;}
+    .score-panel{grid-template-columns:1fr; padding:28px;}
+    .margin-grid{grid-template-columns:1fr;}
+    .pricing-grid{grid-template-columns:1fr 1fr;}
+    .sec-strip{grid-template-columns:1fr 1fr;}
+    .nav-links{display:none;}
+    .menu-toggle{display:block;}
+  }
+  @media (max-width: 560px){
+    .steps{grid-template-columns:1fr;}
+    .pricing-grid{grid-template-columns:1fr;}
+    .sec-strip{grid-template-columns:1fr;}
+    section{padding:64px 0;}
+    .hero{padding:44px 0 40px;}
+    .footer-grid{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span class="logo-mark">A</span>Auto Deal Finder</div>
+    <div class="nav-links">
+      <a href="#comment-ca-marche">Fonctionnement</a>
+      <a href="#score">Le score</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#tarifs" class="btn btn-ghost">Se connecter</a>
+      <a href="#essai" class="btn btn-primary">Essai gratuit</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <div class="wrap hero">
+    <div>
+      <span class="eyebrow"><span class="eyebrow-dot"></span> 24 opportunités détectées aujourd'hui</span>
+      <h1>Trouvez les véhicules <span class="hl">les plus rentables</span> à acheter avant vos concurrents.</h1>
+      <p class="lead">Auto Deal Finder analyse le marché automobile en continu, repère les véhicules sous-évalués et calcule votre marge potentielle — pour que vous sachiez, chaque matin, quoi acheter.</p>
+      <div class="hero-actions">
+        <a href="#essai" class="btn btn-primary btn-lg">Essayer gratuitement 21 jours</a>
+        <a href="#comment-ca-marche" class="btn btn-ghost btn-lg">Voir une démonstration</a>
+      </div>
+      <div class="hero-note">
+        <span><span class="check">✓</span> Sans carte bancaire</span>
+        <span><span class="check">✓</span> Prêt en 3 minutes</span>
+        <span><span class="check">✓</span> Données séparées par entreprise</span>
+      </div>
+    </div>
+
+    <div class="terminal reveal in">
+      <div class="terminal-head">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="terminal-title">MEILLEURES OPPORTUNITÉS · AUJOURD'HUI</span>
+        <span class="terminal-live"><i></i>LIVE</span>
+      </div>
+
+      <div class="deal-row">
+        <div>
+          <div class="deal-name">BMW Série 1 118d</div>
+          <div class="deal-meta">2019 · 112 000 km · Rennes</div>
+        </div>
+        <div class="deal-score score-high">94</div>
+        <div class="deal-margin">+2 100 €</div>
+      </div>
+      <div class="deal-row">
+        <div>
+          <div class="deal-name">Audi A3 35 TDI</div>
+          <div class="deal-meta">2020 · 78 400 km · Nantes</div>
+        </div>
+        <div class="deal-score score-high">91</div>
+        <div class="deal-margin">+1 800 €</div>
+      </div>
+      <div class="deal-row">
+        <div>
+          <div class="deal-name">Peugeot 308 BlueHDi</div>
+          <div class="deal-meta">2021 · 54 200 km · Angers</div>
+        </div>
+        <div class="deal-score score-mid">88</div>
+        <div class="deal-margin">+1 340 €</div>
+      </div>
+      <div class="deal-row">
+        <div>
+          <div class="deal-name">Volkswagen Golf TSI</div>
+          <div class="deal-meta">2019 · 96 800 km · Le Mans</div>
+        </div>
+        <div class="deal-score score-mid">85</div>
+        <div class="deal-margin">+980 €</div>
+      </div>
+
+      <div class="terminal-foot">
+        <span>Prix moyen sous le marché : −12,4 %</span>
+        <span>Marge moyenne : 1 840 €</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="section-border">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="section-tag">Le problème</span>
+        <h2>Chaque bonne affaire vous coûte du temps à trouver.</h2>
+        <p>Entre les annonces à éplucher, les prix à comparer et les marges à calculer à la main, la décision arrive souvent trop tard — quand la voiture est déjà vendue.</p>
+      </div>
+      <div class="problem-grid reveal">
+        <div class="problem-item">
+          <div class="n">01</div>
+          <h3>Recherche dispersée</h3>
+          <p>Des dizaines d'annonces à comparer une à une, sans vue d'ensemble du marché.</p>
+        </div>
+        <div class="problem-item">
+          <div class="n">02</div>
+          <h3>Prix marché incertain</h3>
+          <p>Difficile de savoir si un véhicule est réellement sous-évalué sans passer une heure à comparer.</p>
+        </div>
+        <div class="problem-item">
+          <div class="n">03</div>
+          <h3>Marge calculée à l'instinct</h3>
+          <p>Frais, décote, revente : la marge réelle est rarement calculée avant l'achat.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section-border" id="comment-ca-marche">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="section-tag">Fonctionnement</span>
+        <h2>De la recherche à l'alerte, en un seul outil.</h2>
+        <p>Définissez votre stratégie d'achat une fois. Auto Deal Finder surveille le marché à votre place.</p>
+      </div>
+      <div class="steps reveal">
+        <div class="step" data-n="01">
+          <h3>Définissez vos critères</h3>
+          <p>Budget, marques, kilométrage, zone géographique — votre stratégie d'achat en 2 minutes.</p>
+        </div>
+        <div class="step" data-n="02">
+          <h3>Recevez les opportunités</h3>
+          <p>Chaque véhicule est noté sur 100 selon son prix, sa marge potentielle et la demande du modèle.</p>
+        </div>
+        <div class="step" data-n="03">
+          <h3>Analysez la fiche</h3>
+          <p>Comparaison au marché, frais estimés, prix de revente et marge — tout est expliqué clairement.</p>
+        </div>
+        <div class="step" data-n="04">
+          <h3>Activez une alerte</h3>
+          <p>Soyez notifié dès qu'une nouvelle opportunité correspond à vos critères, avant vos concurrents.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCORE -->
+  <section class="section-border" id="score">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="section-tag">Le score d'opportunité</span>
+        <h2>Un score transparent, jamais une boîte noire.</h2>
+        <p>Chaque note est décomposée. Vous savez toujours pourquoi un véhicule est mis en avant.</p>
+      </div>
+      <div class="score-panel reveal">
+        <div class="score-visual">
+          <div class="score-ring">
+            <div class="val">94<small>/ 100</small></div>
+          </div>
+          <div class="score-tag">Très bonne opportunité</div>
+        </div>
+        <div class="score-bars">
+          <div class="score-bar-row"><span>Prix vs marché</span><div class="bar-track"><div class="bar-fill" style="width:92%"></div></div><span>35%</span></div>
+          <div class="score-bar-row"><span>Potentiel de marge</span><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div><span>30%</span></div>
+          <div class="score-bar-row"><span>Demande du modèle</span><div class="bar-track"><div class="bar-fill" style="width:70%"></div></div><span>15%</span></div>
+          <div class="score-bar-row"><span>Kilométrage</span><div class="bar-track"><div class="bar-fill" style="width:60%"></div></div><span>10%</span></div>
+          <div class="score-bar-row"><span>Âge du véhicule</span><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div><span>5%</span></div>
+          <div class="score-bar-row"><span>Caractéristiques</span><div class="bar-track"><div class="bar-fill" style="width:45%"></div></div><span>5%</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARGIN -->
+  <section class="section-border">
+    <div class="wrap margin-grid">
+      <div class="reveal">
+        <span class="section-tag">Calcul de marge</span>
+        <h2>La marge, sans surprise, avant l'achat.</h2>
+        <p style="color:var(--text-muted); font-size:15.5px; margin-bottom:0;">Prix d'achat, frais estimés et prix de revente probable — le calcul est toujours visible et modifiable. C'est une estimation, jamais une garantie.</p>
+      </div>
+      <div class="ledger reveal">
+        <div class="ledger-row"><span class="lab">Prix d'achat</span><span class="val">17 900 €</span></div>
+        <div class="ledger-row"><span class="lab">Frais estimés</span><span class="val">1 300 €</span></div>
+        <div class="ledger-row"><span class="lab">Coût total</span><span class="val">19 200 €</span></div>
+        <div class="ledger-row"><span class="lab">Prix de revente estimé</span><span class="val">20 500 €</span></div>
+        <div class="ledger-row total"><span class="lab">Marge potentielle</span><span class="val">+ 1 300 €</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section-border" id="tarifs">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <span class="section-tag">Tarifs</span>
+        <h2>Un prix accessible, quelle que soit votre taille.</h2>
+        <p>Commencez gratuitement. Passez à l'offre adaptée à votre rythme d'achat.</p>
+      </div>
+
+      <div class="pricing-note reveal" id="essai">
+        🔥 Offre de lancement : <strong>7,99 €/mois</strong> pendant 3 mois après votre essai gratuit de 21 jours.
+      </div>
+
+      <div class="pricing-grid reveal">
+        <div class="price-card">
+          <div class="price-name">Essai gratuit</div>
+          <div class="price-amount">0 €<small> / 21 jours</small></div>
+          <ul class="price-list">
+            <li>Toutes les fonctionnalités</li>
+            <li>Recherche &amp; scoring illimités</li>
+            <li>Sans carte bancaire</li>
+          </ul>
+          <a href="#" class="btn btn-ghost">Commencer</a>
+        </div>
+        <div class="price-card">
+          <div class="price-name">Basic</div>
+          <div class="price-amount">19,99 €<small> / mois</small></div>
+          <ul class="price-list">
+            <li>1 utilisateur</li>
+            <li>Alertes par email</li>
+            <li>Historique 30 jours</li>
+          </ul>
+          <a href="#" class="btn btn-ghost">Choisir Basic</a>
+        </div>
+        <div class="price-card featured">
+          <div class="price-name">Plus</div>
+          <div class="price-amount">39,99 €<small> / mois</small></div>
+          <ul class="price-list">
+            <li>3 utilisateurs</li>
+            <li>Alertes illimitées</li>
+            <li>Historique complet</li>
+            <li>Comparaison marché avancée</li>
+          </ul>
+          <a href="#" class="btn btn-primary">Choisir Plus</a>
+        </div>
+        <div class="price-card">
+          <div class="price-name">Pro</div>
+          <div class="price-amount">79,99 €<small> / mois</small></div>
+          <ul class="price-list">
+            <li>Utilisateurs illimités</li>
+            <li>Rôles &amp; permissions</li>
+            <li>Support prioritaire</li>
+          </ul>
+          <a href="#" class="btn btn-ghost">Choisir Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY -->
+  <section class="section-border">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="section-tag">Sécurité &amp; confidentialité</span>
+        <h2>Vos données restent les vôtres.</h2>
+      </div>
+      <div class="sec-strip reveal">
+        <div class="sec-item"><div class="sec-icon">◆</div><div><h4>Multi-tenant strict</h4><p>Chaque entreprise a son espace isolé, sans accès croisé.</p></div></div>
+        <div class="sec-item"><div class="sec-icon">◆</div><div><h4>Chiffrement</h4><p>Connexions et mots de passe protégés selon les standards actuels.</p></div></div>
+        <div class="sec-item"><div class="sec-icon">◆</div><div><h4>Conforme RGPD</h4><p>Vos données peuvent être exportées ou supprimées à tout moment.</p></div></div>
+        <div class="sec-item"><div class="sec-icon">◆</div><div><h4>Sauvegardes régulières</h4><p>Vos recherches, favoris et alertes sont sauvegardés en continu.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section-border" id="faq">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <span class="section-tag">Questions fréquentes</span>
+        <h2>Tout ce qu'il faut savoir avant de démarrer.</h2>
+      </div>
+      <div class="faq reveal">
+        <div class="faq-item">
+          <button class="faq-q">D'où viennent les données des véhicules ? <span class="icon">+</span></button>
+          <div class="faq-a"><p>Auto Deal Finder s'appuie sur des sources de données légalement exploitables et des partenariats — jamais sur du scraping non autorisé de plateformes tierces.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">Le score est-il fiable ? <span class="icon">+</span></button>
+          <div class="faq-a"><p>Le score repose sur des règles et des calculs, pas sur des suppositions. Chaque composante est détaillée et consultable en un clic.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">Puis-je avoir plusieurs utilisateurs dans mon entreprise ? <span class="icon">+</span></button>
+          <div class="faq-a"><p>Oui, à partir de l'offre Basic. Vous gérez les rôles et les permissions de chaque utilisateur depuis votre espace administrateur.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">Que se passe-t-il à la fin de l'essai gratuit ? <span class="icon">+</span></button>
+          <div class="faq-a"><p>Vous êtes prévenu avant l'expiration. Aucun prélèvement automatique n'a lieu sans votre confirmation.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">Le logiciel fonctionne-t-il sur mobile ? <span class="icon">+</span></button>
+          <div class="faq-a"><p>Oui. L'interface est entièrement responsive, pensée pour consulter une opportunité directement devant le véhicule.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="section-border">
+    <div class="wrap">
+      <div class="final-cta reveal">
+        <h2>Trouvez votre prochaine bonne affaire dès aujourd'hui.</h2>
+        <p>21 jours d'essai gratuit, sans carte bancaire. Configurez votre stratégie d'achat en 3 minutes.</p>
+        <a href="#" class="btn btn-primary btn-lg">Essayer gratuitement</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">A</span>Auto Deal Finder</div>
+        <p>Le logiciel d'aide à la décision pour l'achat automobile professionnel.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Produit</h5>
+          <a href="#comment-ca-marche">Fonctionnement</a>
+          <a href="#score">Le score</a>
+          <a href="#tarifs">Tarifs</a>
+        </div>
+        <div class="footer-col">
+          <h5>Entreprise</h5>
+          <a href="#">À propos</a>
+          <a href="#">Contact</a>
+          <a href="#">Sécurité</a>
+        </div>
+        <div class="footer-col">
+          <h5>Légal</h5>
+          <a href="#">Mentions légales</a>
+          <a href="#">Confidentialité</a>
+          <a href="#">CGU</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Auto Deal Finder. Tous droits réservés.</span>
+      <span>Fait pour les professionnels de l'automobile d'occasion.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const q = item.querySelector('.faq-q');
+    const a = item.querySelector('.faq-a');
+    q.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.faq-a').style.maxHeight = null;
+      });
+      if(!isOpen){
+        item.classList.add('open');
+        a.style.maxHeight = a.scrollHeight + 'px';
+      }
+    });
+  });
+
+  // Scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.12});
+  revealEls.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
